@@ -41,6 +41,8 @@ Open a `.httpie` file and put the caret inside the request. Press **Ctrl+Option+
 
 You can also click the **green Run triangle in the gutter**, use right-click → **Run HTTPie Request**, or search for the action in **Find Action**.
 
+Pick the environment from the **Environment** combobox in the editor header, or press **Ctrl+Option+E** on macOS (**Ctrl+Alt+E** on Windows/Linux) / right-click → **Select HTTPie Environment** for the same list. Both use the same project-local selection, so changing one updates the other. The shortcut is remappable under **Settings → Keymap → Plug-ins → HTTPie**.
+
 Request methods, URLs (including HTTPie's `:8081` localhost shorthand), comments, headers, `{{variables}}`, strings and directives use your IDE theme's syntax colors. The gutter button runs its own request even when the caret is in another block.
 
 Requests run in the background; cancel them through the IDE's background-task progress UI or the **Stop** button. One request runs per project at a time. Responses open in the IDE **Run** tool window, showing timing, status, headers, body, handler results, stderr and failures. Text is selectable/copyable; available JSONC/XML file types provide syntax coloring. Requests and response handlers each time out after 30 seconds.
@@ -105,7 +107,7 @@ token=replace-me
 export OTHER_VALUE="a value"
 ```
 
-Pick an `.env` file from the **Environment** selector at the top of every `.httpie` editor. It lists env files beside the request file and in the project root; `(none)` is the default and clears the selection. A `# env: local.env` directive anywhere in the request file overrides the selection; relative env paths are checked beside the request file, then in the project root. Absolute paths and `~/` are accepted.
+Pick an `.env` file from the **Environment** selector at the top of every `.httpie` editor, or from the **Select HTTPie Environment** action (**Ctrl+Option+E**/**Ctrl+Alt+E**). Both share the same selection. The list shows env files beside the request file and in the project root; `(none)` is the default and clears the selection. A `# env: local.env` directive anywhere in the request file overrides the selection; relative env paths are checked beside the request file, then in the project root. Absolute paths and `~/` are accepted.
 
 Variables use `{{name}}`. Resolution order: handler globals → env-file values → IDE process/shell environment. Missing variables or unreadable input files stop the request before launching HTTPie. Values from env files and globals are also exported to the HTTPie process. Env files are reread on every run.
 

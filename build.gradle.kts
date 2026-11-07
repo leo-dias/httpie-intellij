@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.leodias"
-version = "0.1.9"
+version = "0.1.10"
 
 repositories {
     mavenCentral()

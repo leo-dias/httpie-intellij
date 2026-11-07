@@ -11,6 +11,23 @@ import javax.swing.KeyStroke
 
 class HttpieShortcutTest : BasePlatformTestCase() {
     private val shortcut = KeyboardShortcut(KeyStroke.getKeyStroke("ctrl alt R"), null)
+    private val environmentShortcut = KeyboardShortcut(KeyStroke.getKeyStroke("ctrl alt E"), null)
+
+    fun testControlOptionEIsBoundAndPromotedInRequestEditor() {
+        for (name in listOf("Mac OS X", "Mac OS X 10.5+", "Eclipse (Mac OS X)")) {
+            val keymap = KeymapManager.getInstance().getKeymap(name)!!
+            assertTrue("Ctrl+Option+E must bind HTTPie in $name", keymap.getActionIds(environmentShortcut).contains("HTTPie.SelectEnvironment"))
+        }
+        myFixture.configureByText("test.httpie", "GET :8081")
+        val manager = ActionManager.getInstance()
+        val candidates = KeymapManager.getInstance().getKeymap("Eclipse (Mac OS X)")!!
+            .getActionIds(environmentShortcut).mapNotNull(manager::getAction)
+        val context = SimpleDataContext.builder().add(CommonDataKeys.PROJECT, project)
+            .add(CommonDataKeys.EDITOR, myFixture.editor).add(CommonDataKeys.VIRTUAL_FILE, myFixture.file.virtualFile).build()
+        val promoter = ActionPromoter.EP_NAME.extensionList.filterIsInstance<HttpieActionPromoter>().single()
+        assertSame("The registered promoter must prioritize HTTPie's environment action",
+            manager.getAction("HTTPie.SelectEnvironment"), promoter.promote(candidates, context)?.firstOrNull())
+    }
 
     fun testControlOptionRIsBoundInMacAndEclipseKeymaps() {
         for (name in listOf("Mac OS X", "Mac OS X 10.5+", "Eclipse (Mac OS X)")) {

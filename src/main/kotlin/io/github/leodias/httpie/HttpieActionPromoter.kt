@@ -11,6 +11,6 @@ class HttpieActionPromoter : ActionPromoter {
         val project = CommonDataKeys.PROJECT.getData(context) ?: return null
         if (CommonDataKeys.EDITOR.getData(context) == null || CommonDataKeys.VIRTUAL_FILE.getData(context)?.extension != "httpie" ||
             project.isDisposed || !TrustedProjects.isProjectTrusted(project)) return null
-        return actions.filterIsInstance<RunHttpieAction>().takeIf { it.isNotEmpty() }
+        return actions.filter { it is RunHttpieAction || it is SelectHttpieEnvironmentAction }.takeIf { it.isNotEmpty() }
     }
 }

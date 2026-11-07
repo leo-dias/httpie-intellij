@@ -32,5 +32,12 @@
             <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="ctrl alt R"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
+        <action id="HTTPie.SelectEnvironment" class="io.github.leodias.httpie.SelectHttpieEnvironmentAction"
+                text="Select HTTPie Environment" description="Select the environment file for requests in this file">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt E"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="ctrl alt E"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="ctrl alt E"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
     </actions>
 </idea-plugin>

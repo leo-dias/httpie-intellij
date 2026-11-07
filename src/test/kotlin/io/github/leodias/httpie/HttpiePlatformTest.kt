@@ -14,6 +14,7 @@ class HttpiePlatformTest : LightPlatformTestCase() {
         assertNotSame("HTTPie files need their own tree icon", AllIcons.FileTypes.Text, fileType.icon)
         assertNotNull("HTTPie file icon must be packaged", javaClass.getResource("/icons/httpieFile.svg"))
         assertNotNull(ActionManager.getInstance().getAction("HTTPie.Run"))
+        assertNotNull(ActionManager.getInstance().getAction("HTTPie.SelectEnvironment"))
         assertNotNull(
             "HTTPie editors need the Environment selector",
             EditorNotificationProvider.EP_NAME.findExtension(HttpieEnvironmentNotificationProvider::class.java, project),

@@ -12,6 +12,7 @@ import com.intellij.execution.ProgramRunnerUtil
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.ui.popup.JBPopupFactory
 
 class RunHttpieAction : DumbAwareAction() {
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
@@ -38,6 +39,31 @@ class RunHttpieAction : DumbAwareAction() {
             if (settings == null) { notifyHttpie(project, "No request found under the caret"); return }
             ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance())
         }
+    }
+}
+
+class SelectHttpieEnvironmentAction : DumbAwareAction() {
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
+
+    override fun update(e: AnActionEvent) {
+        val project = e.project
+        e.presentation.isEnabledAndVisible = project != null &&
+            e.getData(CommonDataKeys.VIRTUAL_FILE)?.extension == "httpie" && TrustedProjects.isProjectTrusted(project)
+    }
+
+    override fun actionPerformed(e: AnActionEvent) {
+        val project = e.project ?: return
+        if (!TrustedProjects.isProjectTrusted(project)) return
+        val file = e.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
+        JBPopupFactory.getInstance()
+            .createActionGroupPopup(
+                "Select Environment",
+                HttpieEnvironments.chooserGroup(project, file),
+                e.dataContext,
+                JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
+                false,
+            )
+            .showInBestPositionFor(e.dataContext)
     }
 }
 
