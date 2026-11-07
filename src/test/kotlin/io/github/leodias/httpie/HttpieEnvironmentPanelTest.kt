@@ -35,27 +35,29 @@ class HttpieEnvironmentPanelTest : BasePlatformTestCase() {
         assertNull(provider.collectNotificationData(project, myFixture.configureByText("notes.txt", "plain").virtualFile))
     }
 
-    fun testComboboxDefaultsToNoneListsEnvironmentsAndControlsSession() {
-        val combo = panel().environmentCombo
-        assertEquals(3, combo.itemCount)
-        assertEquals(NO_ENVIRONMENT, combo.getItemAt(0))
-        assertEquals(NO_ENVIRONMENT, combo.selectedItem)
-        assertEquals(listOf("dev.env", "prod.env"), (1 until combo.itemCount).map { combo.getItemAt(it) })
+    fun testChooserDefaultsToNoneListsEnvironmentsAndControlsSession() {
+        val panel = panel()
+        assertEquals("Environment: $NO_ENVIRONMENT", panel.label())
+        assertEquals(listOf("dev.env", "prod.env"), panel.environments())
+        assertNull(panel.selectedEnvironment())
 
-        combo.selectedItem = "dev.env"
+        panel.selectEnvironment("dev.env")
         assertEquals("dev.env", project.getService(HttpieSession::class.java).selectedEnvironment)
+        assertEquals("Environment: dev.env", panel.label())
 
-        combo.selectedItem = NO_ENVIRONMENT
+        panel.selectEnvironment(null)
         assertNull(project.getService(HttpieSession::class.java).selectedEnvironment)
+        assertEquals("Environment: $NO_ENVIRONMENT", panel.label())
     }
 
-    fun testComboboxRestoresSelectionAndFallsBackToNoneWhenMissing() {
+    fun testChooserRestoresSelectionAndFallsBackToNoneWhenMissing() {
         val session = project.getService(HttpieSession::class.java)
         session.selectedEnvironment = "prod.env"
-        assertEquals("prod.env", panel().environmentCombo.selectedItem)
+        assertEquals("prod.env", panel().selectedEnvironment())
 
         session.selectedEnvironment = "missing.env"
-        assertEquals(NO_ENVIRONMENT, panel().environmentCombo.selectedItem)
+        assertNull(panel().selectedEnvironment())
+        assertEquals("Environment: $NO_ENVIRONMENT", panel().label())
     }
 
     private fun panel(): HttpieEnvironmentPanel = HttpieEnvironmentPanel(project, request)

@@ -1,19 +1,26 @@
 package io.github.leodias.httpie
 
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionUpdateThread
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.ex.ComboBoxAction
 import com.intellij.openapi.fileEditor.FileEditor
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.EditorNotificationPanel
 import com.intellij.ui.EditorNotificationProvider
-import com.intellij.ui.components.JBLabel
+import com.intellij.ui.JBColor
+import com.intellij.ui.border.CustomLineBorder
+import com.intellij.util.ui.JBUI
+import java.awt.BorderLayout
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.function.Function
-import javax.swing.DefaultComboBoxModel
-import javax.swing.JComboBox
 import javax.swing.JComponent
-import javax.swing.event.PopupMenuEvent
-import javax.swing.event.PopupMenuListener
 
 internal const val NO_ENVIRONMENT = "(none)"
 
@@ -22,43 +29,51 @@ class HttpieEnvironmentNotificationProvider : EditorNotificationProvider {
         if (file.extension == "httpie" && file.isInLocalFileSystem) Function { HttpieEnvironmentPanel(project, file) } else null
 }
 
-internal class HttpieEnvironmentPanel(private val project: Project, private val file: VirtualFile) : EditorNotificationPanel() {
-    private val session = project.getService(HttpieSession::class.java)
-    private val model = DefaultComboBoxModel<String>()
-    internal val environmentCombo = JComboBox(model)
-    private var loading = false
+internal class HttpieEnvironmentPanel(project: Project, file: VirtualFile) : EditorNotificationPanel() {
+    private val chooser = EnvironmentChooserAction(project, file)
+    private val toolbar = ActionManager.getInstance()
+        .createActionToolbar("HTTPie.NotificationPanel", DefaultActionGroup(chooser), true)
 
     init {
-        myLinksPanel.add(JBLabel("Environment:"))
-        myLinksPanel.add(environmentCombo)
-        environmentCombo.toolTipText =
-            "Environment file for requests in this file. A # env: directive in the request file takes precedence."
-        environmentCombo.addActionListener {
-            if (!loading) session.selectedEnvironment =
-                environmentCombo.selectedItem?.toString()?.takeUnless { it == NO_ENVIRONMENT }
-        }
-        environmentCombo.addPopupMenuListener(object : PopupMenuListener {
-            override fun popupMenuWillBecomeVisible(event: PopupMenuEvent) = refresh()
-            override fun popupMenuWillBecomeInvisible(event: PopupMenuEvent) = Unit
-            override fun popupMenuCanceled(event: PopupMenuEvent) = Unit
-        })
-        refresh()
+        removeAll()
+        toolbar.targetComponent = this
+        add(toolbar.component, BorderLayout.CENTER)
+        putClientProperty(FileEditorManager.SEPARATOR_DISABLED, true)
+        background = PANEL_BACKGROUND
+        toolbar.component.background = PANEL_BACKGROUND
+        border = CustomLineBorder(JBUI.CurrentTheme.Editor.BORDER_COLOR, 0, 0, 1, 0)
     }
 
-    private fun refresh() {
-        loading = true
-        try {
-            val environments = environments()
-            model.removeAllElements()
-            model.addElement(NO_ENVIRONMENT)
-            environments.forEach(model::addElement)
-            model.selectedItem = session.selectedEnvironment?.takeIf { it in environments } ?: NO_ENVIRONMENT
-        } finally {
-            loading = false
-        }
+    internal fun environments(): List<String> = chooser.environments()
+    internal fun selectedEnvironment(): String? = chooser.selectedName()
+    internal fun selectEnvironment(name: String?) = chooser.choose(name)
+    internal fun label(): String = chooser.label()
+
+    private companion object {
+        val PANEL_BACKGROUND: JBColor = JBColor.namedColor("Editor.SearchField.background", JBColor.background())
+    }
+}
+
+internal class EnvironmentChooserAction(private val project: Project, private val file: VirtualFile) : ComboBoxAction() {
+    init {
+        setSmallVariant(true)
     }
 
-    private fun environments(): List<String> = runCatching {
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
+
+    override fun update(e: AnActionEvent) {
+        e.presentation.text = label()
+    }
+
+    override fun createPopupActionGroup(button: JComponent, context: DataContext): DefaultActionGroup =
+        DefaultActionGroup().apply {
+            add(ChooseEnvironmentAction(null))
+            environments().forEach { add(ChooseEnvironmentAction(it)) }
+        }
+
+    internal fun label(): String = "Environment: ${selectedName() ?: NO_ENVIRONMENT}"
+
+    internal fun environments(): List<String> = runCatching {
         val directories = listOfNotNull(Path.of(file.path).parent, project.basePath?.let(Path::of)).distinct()
         directories.flatMap { directory ->
             if (!Files.isDirectory(directory)) emptyList() else Files.list(directory).use { paths ->
@@ -67,4 +82,20 @@ internal class HttpieEnvironmentPanel(private val project: Project, private val 
             }
         }.distinct().sorted()
     }.getOrDefault(emptyList())
+
+    internal fun selectedName(): String? =
+        project.getService(HttpieSession::class.java).selectedEnvironment?.takeIf { it in environments() }
+
+    internal fun choose(name: String?) {
+        project.getService(HttpieSession::class.java).selectedEnvironment = name
+    }
+
+    private inner class ChooseEnvironmentAction(private val environment: String?) :
+        AnAction(environment ?: NO_ENVIRONMENT) {
+        override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
+
+        override fun actionPerformed(e: AnActionEvent) {
+            choose(environment)
+        }
+    }
 }
