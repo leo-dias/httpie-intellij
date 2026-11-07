@@ -38,3 +38,5 @@
 - 0.1.9: restyled the Environment selector to match the JetBrains HTTP Client header: a small left-aligned combo action inside the editor notification panel (bottom-only border, `Editor.SearchField.background`) instead of a right-aligned label plus combo. Same discovery, default `(none)`, memory-only `HttpieSession.selectedEnvironment`, and `# env:` precedence. Tests updated for the chooser seam.
 
 - 0.1.10: restored the `HTTPie.SelectEnvironment` action (Ctrl+Alt+E / Ctrl+Option+E, remappable) that opens the same environment popup as the editor combobox. Both now read/write one shared `HttpieEnvironments` selection, so choosing in either place updates the other; the combobox label and the popup check mark reflect the current choice.
+
+- 0.1.10 (packaging): added vendor email and Marketplace change notes; documented the publish flow (manual first upload, then `PUBLISH_TOKEN` + `publishPlugin`) and ignored signing keys. `publishPlugin`/`signPlugin` use the plugin defaults (`PUBLISH_TOKEN`; optional `CERTIFICATE_CHAIN`/`PRIVATE_KEY`/`PRIVATE_KEY_PASSWORD`), so no Gradle wiring is needed.

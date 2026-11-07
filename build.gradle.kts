@@ -38,6 +38,12 @@ intellijPlatform {
     buildSearchableOptions = false
     pluginConfiguration {
         name = "HTTPie"
+        changeNotes = """
+            <ul>
+              <li>Environment selector in the editor header, matching the JetBrains HTTP Client layout.</li>
+              <li>Restored the Select HTTPie Environment action (Ctrl+Alt+E / Ctrl+Option+E), sharing state with the combobox.</li>
+            </ul>
+        """.trimIndent()
         ideaVersion {
             sinceBuild = "262.11879.100"
             untilBuild = provider { null }

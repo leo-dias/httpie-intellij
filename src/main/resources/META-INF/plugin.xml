@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>io.github.leodias.httpie</id>
     <name>HTTPie</name>
-    <vendor url="https://github.com/leo-dias">Leonardo Dias de Oliveira</vendor>
+    <vendor url="https://github.com/leo-dias" email="leonardo.dias.oliveira@gmail.com">Leonardo Dias de Oliveira</vendor>
     <description><![CDATA[
         Run requests from .httpie files using the HTTPie CLI without leaving IntelliJ IDEA.
         Supports request blocks, environment files, variable substitution, file bodies,

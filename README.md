@@ -24,7 +24,7 @@ The default build downloads the IDEA 2026.2.4 SDK. To build against an existing 
   -PlocalIdePath="$HOME/Applications/IntelliJ IDEA.app"
 ```
 
-Install `build/distributions/httpie-intellij-0.1.7.zip` using **Settings → Plugins → gear menu → Install Plugin from Disk…**. Restart the IDE if prompted. If upgrading from an earlier version, install this ZIP over it and reopen your `.httpie` files after restarting.
+Install `build/distributions/httpie-intellij-<version>.zip` using **Settings → Plugins → gear menu → Install Plugin from Disk…**. Restart the IDE if prompted. If upgrading from an earlier version, install this ZIP over it and reopen your `.httpie` files after restarting.
 
 To launch a separate development IDE or check binary API compatibility:
 
@@ -33,7 +33,19 @@ To launch a separate development IDE or check binary API compatibility:
 ./gradlew verifyPlugin -PlocalIdePath="$HOME/Applications/IntelliJ IDEA.app"
 ```
 
-No Marketplace publishing or signing is configured. The Gradle wrapper and dependency versions are checked in.
+The Gradle wrapper and dependency versions are checked in.
+
+## Publish to JetBrains Marketplace
+
+The **first** version must be uploaded manually at <https://plugins.jetbrains.com/author/me> → **Add new plugin**, using the ZIP from `./gradlew buildPlugin` (`build/distributions/httpie-intellij-<version>.zip`). Marketplace re-signs it, so an author signature is optional for that first upload.
+
+Later versions publish from Gradle. Create a token at <https://plugins.jetbrains.com/author/me/tokens>, then:
+
+```sh
+PUBLISH_TOKEN=perm:... ./gradlew publishPlugin
+```
+
+`publishPlugin` reads `PUBLISH_TOKEN`, or `signPlugin`/`publishPlugin` read `CERTIFICATE_CHAIN`, `PRIVATE_KEY` and `PRIVATE_KEY_PASSWORD` from the environment when you want author signing. Keep these values out of the repository; the plugin ships without a version upper bound, so bump `version` in `build.gradle.kts` before each publish (Marketplace rejects duplicate versions).
 
 ## Run a request
 

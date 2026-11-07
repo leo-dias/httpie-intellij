@@ -6,3 +6,7 @@ build/
 *.env
 !examples/example.env
 local.properties
+# Marketplace signing material — never commit
+*.pem
+*.crt
+certificates/
