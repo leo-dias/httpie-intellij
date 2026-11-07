@@ -1,0 +1,36 @@
+<idea-plugin>
+    <id>io.github.leodias.httpie</id>
+    <name>HTTPie</name>
+    <vendor url="https://github.com/leo-dias">Leonardo Dias de Oliveira</vendor>
+    <description><![CDATA[
+        Run requests from .httpie files using the HTTPie CLI without leaving IntelliJ IDEA.
+        Supports request blocks, environment files, variable substitution, file bodies,
+        saved responses and JavaScript response handlers. Requires HTTPie; Node.js is
+        optional for handlers. Only run request files you trust.
+    ]]></description>
+    <depends>com.intellij.modules.platform</depends>
+    <extensions defaultExtensionNs="com.intellij">
+        <configurationType implementation="io.github.leodias.httpie.HttpieConfigurationType"/>
+        <programRunner implementation="io.github.leodias.httpie.HttpieProgramRunner"/>
+        <actionPromoter implementation="io.github.leodias.httpie.HttpieActionPromoter" order="first"/>
+        <fileType name="HTTPie" language="HTTPieRequests" extensions="httpie"
+                  implementationClass="io.github.leodias.httpie.HttpieFileType" fieldName="INSTANCE"/>
+        <lang.syntaxHighlighterFactory language="HTTPieRequests"
+                                       implementationClass="io.github.leodias.httpie.HttpieSyntaxHighlighterFactory"/>
+        <lang.parserDefinition language="HTTPieRequests"
+                               implementationClass="io.github.leodias.httpie.HttpieParserDefinition"/>
+        <codeInsight.lineMarkerProvider language="HTTPieRequests"
+                                        implementationClass="io.github.leodias.httpie.HttpieLineMarkerProvider"/>
+        <editorNotificationProvider implementation="io.github.leodias.httpie.HttpieEnvironmentNotificationProvider"/>
+        <notificationGroup id="HTTPie" displayType="BALLOON" isLogByDefault="false"/>
+    </extensions>
+    <actions>
+        <action id="HTTPie.Run" class="io.github.leodias.httpie.RunHttpieAction"
+                text="Run HTTPie Request" description="Run the request under the caret using HTTPie">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt R"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="ctrl alt R"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="ctrl alt R"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>

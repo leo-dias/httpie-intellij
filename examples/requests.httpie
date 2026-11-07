@@ -1,0 +1,21 @@
+# Start a local API on port 8080 and copy example.env to local.env.
+# env: local.env
+
+### Fetch users
+GET {{url}}/users
+
+### Create a user
+POST {{url}}/users
+Content-Type: application/json
+
+{
+  "name": "Ada"
+}
+
+> {%
+  client.test("created", () => client.assert(response.status === 201));
+  client.global.set("userId", response.body.id);
+%}
+
+### Reuse the ID
+GET {{url}}/users/{{userId}}

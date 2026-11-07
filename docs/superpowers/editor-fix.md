@@ -1,0 +1,11 @@
+# Editor regression fix
+
+- [x] Inspect screenshot, source registrations, installed plugin and IDEA log.
+- Findings: file type registered without syntax highlighter or PSI parser; no gutter provider; logs confirm plugin loaded, without an HTTPie exception explaining failure to run.
+- [x] Reproduce screenshot highlighting, editor action availability, gutter markers and response-view construction in actual platform fixtures. Confirmed absent coloring/markers and a response-view NullPointerException caused by accessing JPanel's uninitialized protected accessibility field rather than its getter. The action itself is enabled; the original testAction check was corrected to test update separately (testAction also executes).
+- [x] Implement the missing language/editor registrations and fix any reproduced runtime failure. Explicit getAccessibleContext() now initializes the response panel correctly. Added lightweight lexer/highlighter, flat PSI parser and request-start gutter provider sharing the existing run action entry point.
+- Six editor fixtures pass, including real action execution of localhost `:port` shorthand through HTTPie and a Node response handler. Real test files use canonical temporary paths to satisfy macOS test VFS root guards.
+- [x] Run full test suite, package a versioned update, verify IDE compatibility and document installation. Version 0.1.1 passes the platform verifier on IU-262.11879.100; final rebuild follows review below.
+- Scope: lexer/highlighter, minimal PSI for request-start markers, shared run entry point, response view only if a failure is reproduced, tests, metadata and README. No changes to the Neovim project or installed IDE configuration.
+- Independent focused review found a regex stack overflow on long strings. A 100 KB request regression reproduced StackOverflowError on the target JDK before the possessive-repetition fix; the entire 37-test suite now passes. Extended the real editor test to click the second request's marker while the caret stays in the first request and assert the second handler runs.
+- Remaining verification boundary: these are real IntelliJ platform/editor fixtures, not a visual smoke test of the user's running IDE/theme. Upgrade ZIP must be installed by the user; no installed-plugin/config files were overwritten.
