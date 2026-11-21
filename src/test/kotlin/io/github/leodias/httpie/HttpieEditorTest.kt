@@ -32,7 +32,7 @@ class HttpieEditorTest : BasePlatformTestCase() {
         var methodHighlighted = false
         while (lexer.tokenType != null) {
             if (lexer.tokenText == "GET") {
-                methodHighlighted = highlighter.getTokenHighlights(lexer.tokenType).contains(DefaultLanguageHighlighterColors.KEYWORD)
+                methodHighlighted = highlighter.getTokenHighlights(requireNotNull(lexer.tokenType)).contains(DefaultLanguageHighlighterColors.KEYWORD)
             }
             lexer.advance()
         }
@@ -63,7 +63,7 @@ class HttpieEditorTest : BasePlatformTestCase() {
         lexer.start(file.text)
         val colored = mutableSetOf<String>()
         while (lexer.tokenType != null) {
-            if (highlighter.getTokenHighlights(lexer.tokenType).isNotEmpty()) colored += lexer.tokenText
+            if (highlighter.getTokenHighlights(requireNotNull(lexer.tokenType)).isNotEmpty()) colored += lexer.tokenText
             lexer.advance()
         }
         assertTrue("Header names must be colored", colored.contains("Authorization"))

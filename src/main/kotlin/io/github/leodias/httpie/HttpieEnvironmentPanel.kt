@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.KeepPopupOnPerform
 import com.intellij.openapi.actionSystem.ToggleAction
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction
 import com.intellij.openapi.fileEditor.FileEditor
@@ -55,6 +56,10 @@ internal object HttpieEnvironments {
 
 internal class ChooseEnvironmentAction(private val project: Project, private val environment: String?) :
     ToggleAction(environment ?: NO_ENVIRONMENT) {
+    init {
+        templatePresentation.keepPopupOnPerform = KeepPopupOnPerform.Never
+    }
+
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
     override fun isSelected(e: AnActionEvent): Boolean =

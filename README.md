@@ -111,6 +111,8 @@ GET {{url}}/users/{{userId}}
 
 ## Environments
 
+Place the caret on `{{url}}` and use **Navigate → Declaration or Usages** (**F3** in the Eclipse keymap), or Ctrl/Cmd-click it, to open the `url` assignment in the active environment file. A `# env:` directive takes precedence over the header selection.
+
 Example `local.env`:
 
 ```dotenv

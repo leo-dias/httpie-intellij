@@ -15,7 +15,16 @@ data class PreparedRequest(
 }
 
 object RequestEnvironment {
-    private val variable = Regex("\\{\\{\\s*([\\w]+)\\s*}}")
+    internal val variable = Regex("\\{\\{\\s*([\\w]+)\\s*}}")
+    internal val assignment = Regex("^\\s*(?:export\\s+)?([\\w]+)\\s*=\\s*(.*?)\\s*$")
+    private val directive = Regex("(?m)^\\s*#\\s*env:\\s*(\\S+)")
+
+    internal fun envName(text: CharSequence, selected: String?) = directive.find(text)?.groupValues?.get(1) ?: selected
+
+    internal fun findEnv(name: String, directory: Path, root: Path): Path? {
+        val path = expandedPath(name)
+        return listOf(directory.resolve(path), root.resolve(path)).firstOrNull(Files::isRegularFile)
+    }
 
     fun prepare(
         text: String, caretLine: Int, file: Path, projectRoot: Path, selectedEnv: String?,
@@ -23,10 +32,9 @@ object RequestEnvironment {
     ): PreparedRequest? {
         val request = RequestParser.parse(text, caretLine) ?: return null
         val directory = file.toAbsolutePath().parent
-        val envName = Regex("(?m)^\\s*#\\s*env:\\s*(\\S+)").find(text)?.groupValues?.get(1) ?: selectedEnv
+        val envName = envName(text, selectedEnv)
         val fileVars = if (envName == null) emptyMap() else {
-            val path = expandedPath(envName)
-            val found = listOf(directory.resolve(path), projectRoot.resolve(path)).firstOrNull(Files::isRegularFile)
+            val found = findEnv(envName, directory, projectRoot)
             require(found != null) { "Env file not found: $envName" }
             readEnv(found)
         }
@@ -59,7 +67,7 @@ object RequestEnvironment {
 
     private fun readEnv(path: Path): Map<String, String> = buildMap {
         Files.readAllLines(path).forEach { line ->
-            val match = Regex("^\\s*(?:export\\s+)?([\\w]+)\\s*=\\s*(.*?)\\s*$").matchEntire(line) ?: return@forEach
+            val match = assignment.matchEntire(line) ?: return@forEach
             var value = match.groupValues[2]
             if (value.length >= 2 && ((value.first() == '"' && value.last() == '"') || (value.first() == '\'' && value.last() == '\''))) {
                 value = value.substring(1, value.length - 1)

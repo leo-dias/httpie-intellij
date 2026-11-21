@@ -22,6 +22,7 @@
         <codeInsight.lineMarkerProvider language="HTTPieRequests"
                                         implementationClass="io.github.leodias.httpie.HttpieLineMarkerProvider"/>
         <editorNotificationProvider implementation="io.github.leodias.httpie.HttpieEnvironmentNotificationProvider"/>
+        <gotoDeclarationHandler implementation="io.github.leodias.httpie.HttpieGotoDeclaration"/>
         <notificationGroup id="HTTPie" displayType="BALLOON" isLogByDefault="false"/>
     </extensions>
     <actions>

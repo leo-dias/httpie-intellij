@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.leodias"
-version = "0.1.10"
+version = "0.1.12"
 
 repositories {
     mavenCentral()
@@ -40,8 +40,8 @@ intellijPlatform {
         name = "HTTPie"
         changeNotes = """
             <ul>
-              <li>Environment selector in the editor header, matching the JetBrains HTTP Client layout.</li>
-              <li>Restored the Select HTTPie Environment action (Ctrl+Alt+E / Ctrl+Option+E), sharing state with the combobox.</li>
+              <li>Go to Declaration on a request variable opens its definition in the active environment file.</li>
+              <li>The environment popup closes immediately after a selection.</li>
             </ul>
         """.trimIndent()
         ideaVersion {
