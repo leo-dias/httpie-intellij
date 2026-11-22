@@ -173,7 +173,7 @@ These run through `/bin/sh -c`, with the leading `http` optional. Formatting/sta
 - URLs, headers, commands and responses can contain secrets and are visible in the Run tool window. Do not include secrets in screenshots or shared output. The plugin does not persist its own response history, environment selection or globals; IntelliJ/HTTPie/Node and invoked commands have their own behavior (e.g. HTTPie sessions or shell redirects can write files).
 - Binary file bodies, multipart `<` bodies, pre-request scripts and `client.exit()` are not supported. Use HTTPie's own CLI options where needed.
 - No request completion, automatic env discovery outside the request directory/project root, or built-in HTTP Client integration. Syntax coloring is lightweight, not full embedded JSON/JavaScript language support.
-- If an executable cannot be found, ensure `http --version` / `node --version` works in the IDE's environment and restart the IDE after PATH changes.
+- If an executable cannot be found, check `command -v http` and `http --version` in a terminal (on Windows, use `where http`). The runner searches the request's `PATH` first. On macOS it also checks `/opt/homebrew/bin`, `/usr/local/bin`, and `~/.local/bin`, including when IntelliJ is launched from Finder.
 
 ## Tests and attribution
 

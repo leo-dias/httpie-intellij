@@ -2,6 +2,8 @@ package io.github.leodias.httpie
 
 import com.google.gson.Gson
 import com.google.gson.JsonParser
+import com.intellij.execution.configurations.PathEnvironmentVariableUtil
+import com.intellij.openapi.util.SystemInfo
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -66,8 +68,18 @@ class HttpieRunner(private val timeoutMillis: Long = 30_000) {
     private fun execute(request: PreparedRequest, cancelled: () -> Boolean): Output {
         if (cancelled()) throw CancellationException("Request cancelled")
         val process = try {
-            ProcessBuilder(request.argv).directory(request.directory.toFile()).apply {
+            ProcessBuilder(request.argv.toMutableList()).directory(request.directory.toFile()).apply {
                 environment().putAll(request.environment)
+                if (SystemInfo.isMac) {
+                    // Finder-launched IDEs may have neither Homebrew nor pipx on PATH.
+                    val extra = listOf("/opt/homebrew/bin", "/usr/local/bin", "${System.getProperty("user.home")}/.local/bin")
+                    environment()["PATH"] = (environment()["PATH"].orEmpty().split(':').filter { it.isNotEmpty() } + extra)
+                        .distinct().joinToString(":")
+                }
+                val name = command().first()
+                if ('/' !in name && '\\' !in name) {
+                    PathEnvironmentVariableUtil.findFirst(name, environment()["PATH"])?.let { command()[0] = it.toString() }
+                }
             }.start()
         } catch (e: IOException) {
             throw IllegalStateException("Could not start ${request.argv.first()}. Ensure it is installed and on the IDE's PATH.", e)

@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.leodias"
-version = "0.1.12"
+version = "0.1.13"
 
 repositories {
     mavenCentral()
@@ -40,8 +40,7 @@ intellijPlatform {
         name = "HTTPie"
         changeNotes = """
             <ul>
-              <li>Go to Declaration on a request variable opens its definition in the active environment file.</li>
-              <li>The environment popup closes immediately after a selection.</li>
+              <li>Find HTTPie and Node.js on the request PATH, including common macOS installation directories.</li>
             </ul>
         """.trimIndent()
         ideaVersion {

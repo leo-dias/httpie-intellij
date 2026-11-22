@@ -93,6 +93,13 @@ class HttpieRunnerTest {
         assertTrue(error.message!!.contains("httpie-test-nonexistent"))
     }
 
+    @Test fun `launch uses the request PATH even when the JVM cannot find that executable`() {
+        val tool = Files.writeString(root.resolve("httpie-path-test"), "#!/bin/sh\nprintf 'found on request PATH'")
+        assertTrue(tool.toFile().setExecutable(true))
+        val req = PreparedRequest(listOf(tool.fileName.toString()), root, mapOf("PATH" to root.toString()))
+        assertEquals("found on request PATH", HttpieRunner().run(req, emptyMap()) { false }.response.body)
+    }
+
     @Test fun `timeout terminates sleeping subprocess`() {
         val started = System.nanoTime()
         assertThrows(IllegalStateException::class.java) {
