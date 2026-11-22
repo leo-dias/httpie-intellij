@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.leodias"
-version = "0.1.13"
+version = "0.1.14"
 
 repositories {
     mavenCentral()
@@ -18,6 +18,7 @@ dependencies {
         val localIde = providers.gradleProperty("localIdePath").orNull
         if (localIde != null) local(localIde) else intellijIdea("2026.2.4")
         pluginVerifier()
+        bundledPlugin("com.intellij.java")
         testFramework(TestFrameworkType.Platform)
         testBundledPlugin("com.intellij.plugins.eclipsekeymap")
     }
@@ -40,7 +41,7 @@ intellijPlatform {
         name = "HTTPie"
         changeNotes = """
             <ul>
-              <li>Find HTTPie and Node.js on the request PATH, including common macOS installation directories.</li>
+              <li>Go to Declaration on a request path opens the matching Java Spring controller method.</li>
             </ul>
         """.trimIndent()
         ideaVersion {

@@ -9,6 +9,7 @@
         optional for handlers. Only run request files you trust.
     ]]></description>
     <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="httpie-java.xml">com.intellij.java</depends>
     <extensions defaultExtensionNs="com.intellij">
         <configurationType implementation="io.github.leodias.httpie.HttpieConfigurationType"/>
         <programRunner implementation="io.github.leodias.httpie.HttpieProgramRunner"/>

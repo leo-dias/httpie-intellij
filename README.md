@@ -111,6 +111,8 @@ GET {{url}}/users/{{userId}}
 
 ## Environments
 
+In a Java Spring project, use **Go to Declaration** (**F3** in the Eclipse keymap) on the path in `GET :8080/my-api` or `GET {{url}}/my-api` to open the matching controller method. Navigation combines class and method mappings and checks the HTTP verb. Literal paths take priority over single-segment `{key}` variables; IntelliJ offers a chooser for equally specific matches. This supports annotated Java controllers, not functional routes or regex path patterns.
+
 Place the caret on `{{url}}` and use **Navigate → Declaration or Usages** (**F3** in the Eclipse keymap), or Ctrl/Cmd-click it, to open the `url` assignment in the active environment file. A `# env:` directive takes precedence over the header selection.
 
 Example `local.env`:

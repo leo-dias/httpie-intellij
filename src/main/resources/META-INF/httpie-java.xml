@@ -1,0 +1,5 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <gotoDeclarationHandler implementation="io.github.leodias.httpie.SpringRouteDeclaration"/>
+    </extensions>
+</idea-plugin>
