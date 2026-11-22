@@ -2,8 +2,8 @@ package io.github.leodias.httpie
 
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import com.intellij.execution.configurations.PathEnvironmentVariableUtil
 import com.intellij.openapi.util.SystemInfo
+import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -78,7 +78,15 @@ class HttpieRunner(private val timeoutMillis: Long = 30_000) {
                 }
                 val name = command().first()
                 if ('/' !in name && '\\' !in name) {
-                    PathEnvironmentVariableUtil.findFirst(name, environment()["PATH"])?.let { command()[0] = it.toString() }
+                    val extensions = if (SystemInfo.isWindows) {
+                        (environment()["PATHEXT"] ?: ".COM;.EXE;.BAT;.CMD").split(';').filter { it.startsWith('.') }
+                    } else emptyList()
+                    val names = if (extensions.any { name.endsWith(it, ignoreCase = true) }) listOf(name)
+                        else extensions.map { name + it } + name
+                    environment()["PATH"].orEmpty().split(File.pathSeparatorChar).asSequence()
+                        .map(::File).filter { it.isAbsolute }
+                        .flatMap { dir -> names.map { File(dir, it) } }
+                        .firstOrNull { it.isFile && it.canExecute() }?.let { command()[0] = it.path }
                 }
             }.start()
         } catch (e: IOException) {

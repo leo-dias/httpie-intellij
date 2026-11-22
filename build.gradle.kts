@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.leodias"
-version = "0.1.14"
+version = "0.1.15"
 
 repositories {
     mavenCentral()
@@ -42,6 +42,7 @@ intellijPlatform {
         changeNotes = """
             <ul>
               <li>Go to Declaration on a request path opens the matching Java Spring controller method.</li>
+              <li>Restore request execution on IntelliJ IDEA 2026.2 by using standard Java executable lookup.</li>
             </ul>
         """.trimIndent()
         ideaVersion {
@@ -50,6 +51,9 @@ intellijPlatform {
         }
     }
     pluginVerification {
-        ides { current() }
+        ides {
+            current()
+            providers.gradleProperty("additionalVerifierIde").orNull?.let { local(file(it)) }
+        }
     }
 }
